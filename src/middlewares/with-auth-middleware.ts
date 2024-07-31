@@ -3,6 +3,7 @@ import { jwtVerify } from "jose";
 import { JWSInvalid, JWSSignatureVerificationFailed, JWTExpired, JWTInvalid } from "jose/errors";
 import { AuthenticationError } from "../errors/authentication-error";
 import { accessTokenKey, JWTHandler, refreshTokenKey } from "../lib/jwt-handler";
+import { env } from "../lib/env";
 
 export async function withAuthMiddleware(req: Request, res: Response, next: NextFunction) {
   const authorizationHeader = req.headers.authorization;
@@ -16,11 +17,12 @@ export async function withAuthMiddleware(req: Request, res: Response, next: Next
     );
     (req as any).userID = accessTokenVerification.payload.userID;
   } catch (error) {
-    console.log(error);
+    if (env.NODE_ENV == "development") console.log(error);
+
     if (
       error instanceof JWTInvalid ||
       error instanceof JWSInvalid ||
-      JWSSignatureVerificationFailed
+      error instanceof JWSSignatureVerificationFailed
     )
       throw new AuthenticationError("Invalid Access Token.");
     if (error instanceof JWTExpired) {
@@ -39,16 +41,18 @@ export async function withAuthMiddleware(req: Request, res: Response, next: Next
           refreshTokenVerification.payload.userID
         );
 
-        (req as any).userID = refreshTokenVerification.payload.userID;
         res.setHeader("authorization", `Bearer ${newAccessToken}`);
         res.cookie("refresh-token", newRefreshToken, {
           httpOnly: true,
           sameSite: "lax",
           path: "/",
+          signed: true,
           maxAge: 1000 * 60 * 60 * 24 * 365 // 1 year
         });
-        next();
+        return res.json({ message: "New Access and Refresh Tokens provided." });
       } catch (error) {
+        if (env.NODE_ENV == "development") console.log(error);
+
         if (
           error instanceof JWTInvalid ||
           error instanceof JWSInvalid ||

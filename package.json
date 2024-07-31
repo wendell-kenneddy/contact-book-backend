@@ -2,12 +2,13 @@
   "name": "contact-book",
   "description": "A simple contact book backend.",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "/src/server.ts",
   "author": "Wendell Kenneddy",
   "license": "MIT",
   "keywords": [],
   "scripts": {
-    "dev": "dotenvx run -- tsx watch src/server.ts"
+    "dev": "dotenvx run -- tsx watch src/server.ts",
+    "build": "esbuild src/server.ts --bundle --platform=node --packages=external --outdir=dist --minify"
   },
   "devDependencies": {
     "@eslint/js": "^9.8.0",

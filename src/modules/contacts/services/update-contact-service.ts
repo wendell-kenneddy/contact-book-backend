@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { ClientError } from "../../../errors/client-error";
 import { prisma } from "../../../lib/prisma";
+import { redis } from "../../../lib/redis";
 
 const updateContactDataSchema = z.object({
   userID: z.string().uuid("Invalid user ID."),
@@ -28,5 +29,7 @@ export class UpdateContactService {
         updated_at: new Date()
       }
     });
+    const [, keys] = await redis.scan(0, "MATCH", `contacts:${userID}:*`);
+    if (keys.length) await redis.del(keys);
   }
 }

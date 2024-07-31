@@ -5,6 +5,8 @@ const envSchema = z.object({
   API_BASE_URL: z.string().url(),
   ORIGIN: z.string(),
   PORT: z.coerce.number(),
+  REDIS_HOST: z.string(),
+  REDIS_PORT: z.coerce.number(),
   ACCESS_TOKEN_SECRET: z.string(),
   REFRESH_TOKEN_SECRET: z.string(),
   COOKIE_SECRET: z.string(),

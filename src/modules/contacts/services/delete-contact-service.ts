@@ -1,6 +1,7 @@
 import z from "zod";
 import { ClientError } from "../../../errors/client-error";
 import { prisma } from "../../../lib/prisma";
+import { redis } from "../../../lib/redis";
 
 const deleteContactDataSchema = z.object({
   userID: z.string().uuid("Invalid user ID."),
@@ -17,5 +18,7 @@ export class DeleteContactService {
     if (!contact) throw new ClientError("Contact not found.");
 
     await prisma.contact.delete({ where: { id: contactID, owner_id: userID } });
+    const [, keys] = await redis.scan(0, "MATCH", `contacts:${userID}:*`);
+    if (keys.length) await redis.del(keys);
   }
 }

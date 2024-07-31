@@ -13,6 +13,7 @@ export class AuthController {
       httpOnly: true,
       sameSite: "lax",
       path: "/",
+      signed: true,
       maxAge: 1000 * 60 * 60 * 24 * 365
     });
     res.json({ message: "User successfully signed in." });
@@ -27,6 +28,7 @@ export class AuthController {
       httpOnly: true,
       sameSite: "lax",
       path: "/",
+      signed: true,
       maxAge: 1000 * 60 * 60 * 24 * 365
     });
     res.json({ message: "User successfully signed up." });

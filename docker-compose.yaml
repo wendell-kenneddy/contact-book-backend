@@ -1,0 +1,38 @@
+name: contact-book
+
+services:
+  api:
+    container_name: api
+    build: .
+    ports:
+      - 5000:5000
+    depends_on:
+      - db
+      - cache
+    restart: always
+    env_file:
+      - .env
+  db:
+    container_name: db
+    hostname: postgres
+    image: postgres:latest
+    ports:
+      - 5743:5432
+    env_file:
+      - .env
+    restart: always
+    volumes:
+      - db-data:/etc/data
+  cache:
+    container_name: cache
+    hostname: redis
+    image: redis:latest
+    ports:
+      - 8080:6379
+    restart: always
+    volumes:
+      - redis-data:/etc/data
+
+volumes:
+  db-data:
+  redis-data:
